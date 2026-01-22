@@ -172,8 +172,8 @@ if __name__ == "__main__":
             print(f"   {item['url']}\n")
 
     # Top Headlines 示例
-    headlines = gnews_top_headlines(category="general", from_=time_range, max=10)
-    print("## Top Headlines (general)\n")
+    headlines = gnews_top_headlines(category="world", from_=time_range, max=10)
+    print("## Top Headlines (world)\n")
     if not headlines:
         print("没有找到相关的新闻。")
     else:
