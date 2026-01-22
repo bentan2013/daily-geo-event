@@ -1,0 +1,2 @@
+# 本机本地 wheel（不可移植）：仅适用于此路径存在的机器
+/Users/ben7276/projects/AgenticGIS/gen-ai-toolkit/dist/gen_ai_toolkit-0.9.8-py3-none-any.whl

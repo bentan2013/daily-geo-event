@@ -1,6 +1,21 @@
 # daily-geo-event
 Daily Geo-Impact Digest: Tracking Location-Driven News Events
 
+## Install
+
+```bash
+uv venv --python=python3.13 --seed
+```
+
+Activate (macOS/Linux):
+
+```bash
+source .venv/bin/activate
+```
+
+```
+uv pip install /Users/ben7276/projects/AgenticGIS/gen-ai-toolkit/dist/gen_ai_toolkit-0.9.8-py3-none-any.whl
+```
 
 ## GNew API
 
