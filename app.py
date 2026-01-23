@@ -30,7 +30,7 @@ def get_default_headlines():
     for category in catagories:
         cat_headlines = gnews_top_headlines(category=category, from_=time_range, max=max_count)
         headlines.extend(cat_headlines)
-    # 去重
+    # Remove duplicates
     seen_urls = set()
     unique_headlines = []
     for item in headlines:
