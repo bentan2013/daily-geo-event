@@ -29,14 +29,14 @@ def construct_geo_headlines_prompt(headlines: Iterable[dict]) -> str:
 
 
 def filter_geo_headlines_with_agent(headlines: list[dict], model: str | None = None) -> list[int]:
-	"""使用 gait Agent 返回命中的 headline 序号列表。"""
+	"""Return the list of headline indices selected by the gait Agent."""
 
 	from gait import Agent
 
 	if model is None:
 		deployment = os.environ.get("AZURE_API_DEPLOYMENT")
 		if not deployment:
-			raise ValueError("缺少环境变量 AZURE_API_DEPLOYMENT")
+			raise ValueError("Missing environment variable AZURE_API_DEPLOYMENT")
 		model = "azure/" + deployment
 
 	agent = Agent(
@@ -50,8 +50,7 @@ def filter_geo_headlines_with_agent(headlines: list[dict], model: str | None = N
 
 
 def filter_geo_headlines(headlines: list[dict], model: str | None = None) -> list[dict]:
-	"""返回被 gait 选中的 geo 相关新闻条目。"""
+	"""Return geo-related news items selected by gait."""
 
 	indices = filter_geo_headlines_with_agent(headlines, model=model)
 	return [headlines[i - 1] for i in indices if 1 <= i <= len(headlines)]
-

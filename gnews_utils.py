@@ -5,27 +5,27 @@ import urllib.parse
 import urllib.request
 from dotenv import load_dotenv
 
-# 加载环境变量
+# Load environment variables
 load_dotenv()
 API_KEY = os.getenv("GNEWS_API_KEY")
 
 
 def gnews_search(q: str, from_: str | None = None, max: int = 10, **kwargs):
-    """GNews Search API 查询。
+    """Query GNews Search API.
 
-    说明：`from` 在 Python 里是关键字，函数形参使用 `from_`。
-    如需按用例传入名为 `from` 的键，可用：gnews_search(q, **{"from": "..."}).
+    Note: `from` is a keyword in Python, so the function argument uses `from_`.
+    If you need to pass a key named `from` via kwargs, use: gnews_search(q, **{"from": "..."}).
 
     Args:
-        q: 查询关键词。
-        from_: 起始时间（UTC ISO-8601），例如 "2026-01-22T00:00:00Z"。
-        max: 最大返回条数。
+        q: Query keywords.
+        from_: Start time (UTC ISO-8601), e.g., "2026-01-22T00:00:00Z".
+        max: Maximum number of results.
 
     Returns:
-        文章列表（做了轻度字段归一化）。
+        List of articles (with slight field normalization).
     """
 
-    # 兼容通过 kwargs 传入 `from`（因为 `from` 不能作为 Python 形参名）
+    # Compatibility for passing `from` via kwargs (since `from` cannot be a Python parameter name)
     if from_ is None and "from" in kwargs:
         from_ = kwargs.pop("from")
 
@@ -35,7 +35,7 @@ def gnews_search(q: str, from_: str | None = None, max: int = 10, **kwargs):
 
     if not API_KEY:
         raise ValueError(
-            "缺少环境变量 GNEWS_API_KEY（可放到 .env 或系统环境变量中）。"
+            "Missing environment variable GNEWS_API_KEY (can be set in .env or system environment variables)."
         )
 
     params = {
@@ -43,7 +43,7 @@ def gnews_search(q: str, from_: str | None = None, max: int = 10, **kwargs):
         "lang": "en",
         "max": int(max),
         "sortby": "relevance",
-        # GNews v4 常见用法是 apikey=...
+        # Common usage for GNews v4 is apikey=...
         "apikey": API_KEY,
     }
     if from_:
@@ -74,26 +74,26 @@ def gnews_search(q: str, from_: str | None = None, max: int = 10, **kwargs):
         return results
 
     except Exception as e:
-        print(f"获取新闻时出错：{str(e)}")
+        print(f"Error fetching news: {str(e)}")
         return []
 
 
 def gnews_top_headlines(
     category: str = "general", from_: str | None = None, max: int = 10, **kwargs
 ):
-    """获取 GNews Top Headlines。
+    """Get GNews Top Headlines.
 
     Args:
-        category: 新闻分类，例如 "general", "world", "nation", "business", "technology",
-            "entertainment", "sports", "science", "health"。
-        from_: 起始时间（UTC ISO-8601），例如 "2026-01-22T00:00:00Z"。
-        max: 最大返回条数。
+        category: News category, e.g., "general", "world", "nation", "business", "technology",
+            "entertainment", "sports", "science", "health".
+        from_: Start time (UTC ISO-8601), e.g., "2026-01-22T00:00:00Z".
+        max: Maximum number of results.
 
     Returns:
-        文章列表（字段结构与 gnews_search 基本一致）。
+        List of articles (field structure consistent with gnews_search).
     """
 
-    # 兼容通过 kwargs 传入 `from`（因为 `from` 不能作为 Python 形参名）
+    # Compatibility for passing `from` via kwargs (since `from` cannot be a Python parameter name)
     if from_ is None and "from" in kwargs:
         from_ = kwargs.pop("from")
 
@@ -103,7 +103,7 @@ def gnews_top_headlines(
 
     if not API_KEY:
         raise ValueError(
-            "缺少环境变量 GNEWS_API_KEY（可放到 .env 或系统环境变量中）。"
+            "Missing environment variable GNEWS_API_KEY (can be set in .env or system environment variables)."
         )
 
     params = {
@@ -141,19 +141,19 @@ def gnews_top_headlines(
         return results
 
     except Exception as e:
-        print(f"获取新闻时出错：{str(e)}")
+        print(f"Error fetching news: {str(e)}")
         return []
 
 
 def get_geo_news(
         time_range = (datetime.now() - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%SZ')
     ):
-    """兼容旧函数名：默认查询 place，并传入 time_range 作为 from。"""
+    """Compatible with old function name: defaults to querying 'place', using time_range as from."""
 
     keywords = "place OR location OR map OR geospatial OR geography OR geoinformatics OR GIS OR spatial"
     return gnews_search(q=keywords, from_=time_range, max=10)
 
-# 示例使用
+# Example usage
 if __name__ == "__main__":
 
     time_range = (datetime.now() - timedelta(hours=24)).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -161,9 +161,9 @@ if __name__ == "__main__":
     print("## GeoNews from {time_range}\n".format(time_range=time_range))
 
     if not news:
-        print("没有找到相关的新闻。")
+        print("No related news found.")
     else:
-        # 打印新闻列表
+        # Print news list
         for idx, item in enumerate(news, 1):
             print(f"{idx}. [{item['source']}] {item['title']}")
             if item.get("description"):
@@ -171,11 +171,11 @@ if __name__ == "__main__":
             print(f"   {item['published']}")
             print(f"   {item['url']}\n")
 
-    # Top Headlines 示例
+    # Top Headlines Example
     headlines = gnews_top_headlines(category="world", from_=time_range, max=10)
     print("## Top Headlines (world)\n")
     if not headlines:
-        print("没有找到相关的新闻。")
+        print("No related news found.")
     else:
         for idx, item in enumerate(headlines, 1):
             print(f"{idx}. [{item['source']}] {item['title']}")
