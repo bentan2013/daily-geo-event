@@ -1,5 +1,10 @@
 import os
 from typing import Iterable
+from pydantic import BaseModel
+
+
+class GeoHeadlineSelection(BaseModel):
+	indices: list[int]
 
 
 def construct_geo_filter_instructions_in_en() -> str:
@@ -8,7 +13,7 @@ def construct_geo_filter_instructions_in_en() -> str:
 		"identify and extract only those that are related to geography, "
 		"including topics such as places, locations, maps, geospatial data, "
 		"geography, geoinformatics, GIS, and spatial analysis, we will use the location or places mentioned in the news for further analysis. "
-		"Only return the number of the geo related headlines found. Only numbers should be returned. No additional text."
+		"Select the indices of the geo related headlines."
 	)
 
 
@@ -23,8 +28,8 @@ def construct_geo_headlines_prompt(headlines: Iterable[dict]) -> str:
 	return prompt
 
 
-def filter_geo_headlines_with_agent(headlines: list[dict], model: str | None = None) -> str:
-	"""使用 gait Agent 返回命中的 headline 序号字符串。"""
+def filter_geo_headlines_with_agent(headlines: list[dict], model: str | None = None) -> list[int]:
+	"""使用 gait Agent 返回命中的 headline 序号列表。"""
 
 	from gait import Agent
 
@@ -34,22 +39,19 @@ def filter_geo_headlines_with_agent(headlines: list[dict], model: str | None = N
 			raise ValueError("缺少环境变量 AZURE_API_DEPLOYMENT")
 		model = "azure/" + deployment
 
-	agent = Agent(model=model, instructions=construct_geo_filter_instructions_in_en())
+	agent = Agent(
+		model=model,
+		instructions=construct_geo_filter_instructions_in_en(),
+		response_format=GeoHeadlineSelection
+	)
 	response = agent(construct_geo_headlines_prompt(headlines))
-	return response.content
-
-
-def parse_headline_indices(text: str) -> list[int]:
-	"""把 Agent 返回的序号文本解析成 int 列表（支持逗号/空格/换行分隔）。"""
-
-	parts = text.replace(",", " ").replace("\n", " ").split()
-	return [int(p) for p in parts if p.isdigit()]
+	selection = GeoHeadlineSelection.model_validate_json(response.content)
+	return selection.indices
 
 
 def filter_geo_headlines(headlines: list[dict], model: str | None = None) -> list[dict]:
 	"""返回被 gait 选中的 geo 相关新闻条目。"""
 
-	no_list_text = filter_geo_headlines_with_agent(headlines, model=model)
-	indices = parse_headline_indices(no_list_text)
+	indices = filter_geo_headlines_with_agent(headlines, model=model)
 	return [headlines[i - 1] for i in indices if 1 <= i <= len(headlines)]
 
