@@ -153,6 +153,28 @@ def get_geo_news(
     keywords = "place OR location OR map OR geospatial OR geography OR geoinformatics OR GIS OR spatial"
     return gnews_search(q=keywords, from_=time_range, max=10)
 
+
+def get_default_headlines():
+    time_range = (datetime.now() - timedelta(hours=36)).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+    max_count = 15
+    # select from general, world, nation, business, technology, entertainment, sports, science and health
+    categories = ["world", "general", "nation", "business", "technology", "entertainment", "sports", "science", "health"]
+
+    headlines = []
+    for category in categories:
+        cat_headlines = gnews_top_headlines(category=category, from_=time_range, max=max_count)
+        headlines.extend(cat_headlines)
+    # Remove duplicates
+    seen_urls = set()
+    unique_headlines = []
+    for item in headlines:
+        if item['url'] not in seen_urls:
+            unique_headlines.append(item)
+            seen_urls.add(item['url'])
+    return unique_headlines
+
+
 # Example usage
 if __name__ == "__main__":
 

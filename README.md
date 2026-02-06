@@ -79,7 +79,53 @@ Get top headlines by category.
        -d '{"category": "technology", "max": 5}'
   ```
 
-## GNew API
+## MCP Server
+
+This project provides an [MCP (Model Context Protocol)](https://github.com/modelcontextprotocol/python-sdk) server that exposes the geo-headline filtering logic as a tool. This allows other AI agents to directly invoke the news filtering service.
+
+### Deployment
+
+To run the MCP server:
+
+```bash
+# Ensure environment variables (GNEWS_API_KEY, AZURE_API_DEPLOYMENT) are set
+python mcp_server.py
+```
+
+### Usage
+
+The server exposes the following tool:
+
+- **`get_geo_headlines`**: Fetches the latest headlines from various categories (world, general, technology, etc.) and filters them to return only those relevant to geography or geospatial topics.
+
+### Calling from an MCP Client
+
+You can connect to this server using any MCP-compliant client. For example, using the Python SDK:
+
+```python
+from mcp.client.stdio import StdioServerParameters, stdio_client
+from mcp.client.session import ClientSession
+
+server_params = StdioServerParameters(
+    command="python",
+    args=["mcp_server.py"],
+    env=None # Optional: pass environment variables here if needed
+)
+
+async with stdio_client(server_params) as (read, write):
+    async with ClientSession(read, write) as session:
+        await session.initialize()
+
+        # List tools
+        tools = await session.list_tools()
+        print(tools)
+
+        # Call the tool
+        result = await session.call_tool("get_geo_headlines")
+        print(result)
+```
+
+## GNews API
 
 https://docs.gnews.io/
 
