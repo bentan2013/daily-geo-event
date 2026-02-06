@@ -159,10 +159,10 @@ def get_default_headlines():
 
     max_count = 15
     # select from general, world, nation, business, technology, entertainment, sports, science and health
-    catagories = ["world", "general", "nation", "business", "technology", "entertainment", "sports", "science", "health"]
+    categories = ["world", "general", "nation", "business", "technology", "entertainment", "sports", "science", "health"]
 
     headlines = []
-    for category in catagories:
+    for category in categories:
         cat_headlines = gnews_top_headlines(category=category, from_=time_range, max=max_count)
         headlines.extend(cat_headlines)
     # Remove duplicates
