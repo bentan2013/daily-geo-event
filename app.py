@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 import uvicorn
 
-from gnews_utils import gnews_top_headlines, gnews_search
+from gnews_utils import gnews_top_headlines, gnews_search, get_default_headlines
 from geofilter_utils import filter_geo_headlines
 
 app = FastAPI()
@@ -18,26 +18,6 @@ class TopHeadlinesRequest(BaseModel):
     category: str = "general"
     from_: Optional[str] = Field(None, alias="from")
     max: int = 10
-
-def get_default_headlines():
-    time_range = (datetime.now() - timedelta(hours=36)).strftime('%Y-%m-%dT%H:%M:%SZ')
-
-    max_count = 15 
-    # select from general, world, nation, business, technology, entertainment, sports, science and health
-    catagories = ["world", "general", "nation", "business", "technology", "entertainment", "sports", "science", "health"]
-
-    headlines = []
-    for category in catagories:
-        cat_headlines = gnews_top_headlines(category=category, from_=time_range, max=max_count)
-        headlines.extend(cat_headlines)
-    # Remove duplicates
-    seen_urls = set()
-    unique_headlines = []
-    for item in headlines:
-        if item['url'] not in seen_urls:
-            unique_headlines.append(item)
-            seen_urls.add(item['url'])
-    return unique_headlines
 
 @app.get("/")
 def read_root():
